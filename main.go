@@ -21,6 +21,11 @@ func main() {
 	var outputPath string
 	fmt.Scan(&outputPath)
 
+	// Ensure that the output folder exists, create it if it doesn't
+	if err := os.MkdirAll(outputPath, os.ModePerm); err != nil {
+		log.Fatalf("Error creating output folder: %v", err)
+	}
+
 	qr, err := qrcode.New(data, qrcode.Medium)
 	if err != nil {
 		log.Fatal(err)
