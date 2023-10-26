@@ -19,6 +19,8 @@ var outputFolder string // Define outputFolder as a global variable
 func main() {
 	app := fiber.New()
 
+	app.Static("/output", "./outputFolder")
+
 	// Serve the HTML form
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendFile("index.html")
@@ -102,6 +104,7 @@ func main() {
 		fileName := c.Query("file")
 		filePath := filepath.Join(outputFolder, fileName)
 
+		c.Response().Header.Add("Content-Disposition", "attachment; filename="+fileName)
 		return c.SendFile(filePath)
 	})
 

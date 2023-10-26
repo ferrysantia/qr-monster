@@ -1,66 +1,70 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>QR Monster</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">QR Monster</h1>
         <form action="/generate" method="POST">
             <div class="mb-4">
                 <label for="inputFolder" class="block font-semibold">Input Folder Path:</label>
-                <input type="text" id="inputFolder" name="inputFolder" class="w-full p-2 border border-gray-300 rounded">
+                <input type="text" id="inputFolder" name="inputFolder"
+                    class="w-full p-2 border border-gray-300 rounded">
             </div>
             <div class="mb-4">
                 <label for="outputFolder" class="block font-semibold">Output Folder Path:</label>
-                <input type="text" id="outputFolder" name="outputFolder" class="w-full p-2 border border-gray-300 rounded">
+                <input type="text" id="outputFolder" name="outputFolder"
+                    class="w-full p-2 border border-gray-300 rounded">
             </div>
             <div class="mb-4">
                 <label for="inputFileName" class="block font-semibold">Input File Name:</label>
-                <input type="text" id="inputFileName" name="inputFileName" class="w-full p-2 border border-gray-300 rounded">
+                <input type="text" id="inputFileName" name="inputFileName"
+                    class="w-full p-2 border border-gray-300 rounded">
             </div>
             <button type="submit" class="bg-blue-500 text-white p-2 rounded">Generate QR Codes</button>
         </form>
 
+        <div id="generatedContent" class="mt-8">
+            <!-- This is where the generated content will be displayed -->
+        </div>
 
-<div id="generatedContent">
-    <!-- This is where the generated content will be displayed -->
-</div>
+        <script>
+            document.querySelector('form').addEventListener('submit', async function (event) {
+                event.preventDefault();
 
-<script>
-    document.querySelector('form').addEventListener('submit', async function(event) {
-        event.preventDefault();
+                const inputFolder = document.querySelector('#inputFolder').value;
+                const outputFolder = document.querySelector('#outputFolder').value;
+                const inputFileName = document.querySelector('#inputFileName').value;
 
-        const inputFolder = document.querySelector('#inputFolder').value;
-        const outputFolder = document.querySelector('#outputFolder').value;
-        const inputFileName = document.querySelector('#inputFileName').value;
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `inputFolder=${inputFolder}&outputFolder=${outputFolder}&inputFileName=${inputFileName}`,
+                });
 
-        const response = await fetch('/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `inputFolder=${inputFolder}&outputFolder=${outputFolder}&inputFileName=${inputFileName}`,
-        });
+                if (response.ok) {
+                    const qrCodeFilePaths = await response.json();
+                    const generatedContent = document.querySelector('#generatedContent');
 
-        if (response.ok) {
-            const qrCodeFilePaths = await response.json();
-            const generatedContent = document.querySelector('#generatedContent');
-
-            generatedContent.innerHTML = '';
-            for (const filePath of qrCodeFilePaths) {
-                const fileName = filePath.split('/').pop();
-                generatedContent.innerHTML += `
-                    <p>File: ${fileName}</p>
-                    <a href="/download?file=${fileName}" download>Download ${fileName}</a><br><br>
-                `;
-            }
-        } else {
-            alert('Failed to generate QR codes.');
-        }
-    });
-</script>
+                    generatedContent.innerHTML = '';
+                    for (const filePath of qrCodeFilePaths) {
+                        const fileName = filePath.split('/').pop();
+                        generatedContent.innerHTML += `
+                            <p>File: ${fileName}</p>
+                            <a href="/output/${fileName}" download>Download ${fileName}</a><br><br>
+                        `;
+                    }
+                } else {
+                    alert('Failed to generate QR codes.');
+                }
+            });
+        </script>
 </body>
-</html>
 
+</html>
