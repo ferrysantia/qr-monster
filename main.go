@@ -11,8 +11,15 @@ import (
 )
 
 func main() {
-	// String to encode in the QR code
-	data := "some_string"
+	// Prompt the user to enter the data for the QR code
+	fmt.Print("Enter the data for the QR code: ")
+	var data string
+	fmt.Scan(&data)
+
+	// Prompt the user to enter the path for the output folder
+	fmt.Print("Enter the path for the output folder: ")
+	var outputPath string
+	fmt.Scan(&outputPath)
 
 	qr, err := qrcode.New(data, qrcode.Medium)
 	if err != nil {
@@ -23,8 +30,9 @@ func main() {
 
 	img := qr.Image(256)
 
-	// Save the QR code image to a file
-	file, err := os.Create("qrcode.png")
+	// Save the QR code image to the specified output folder
+	outputFilePath := outputPath + "/qrcode.png"
+	file, err := os.Create(outputFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,5 +43,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("QR code saved as qrcode.png")
+	fmt.Printf("QR code saved as %s\n", outputFilePath)
 }
